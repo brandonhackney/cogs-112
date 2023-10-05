@@ -1,0 +1,11 @@
+# System files
+.DS_Store
+*.asv
+*.log
+
+# Catch any leftovers from other languages
+__pycache__/
+*.py[cod]
+*$py.class
+
+.Rhistory
