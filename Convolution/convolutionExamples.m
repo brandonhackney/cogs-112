@@ -3,8 +3,8 @@
 
 % init
 close all
-boxType = 'sustain';
-kernType = 'steps';
+boxType = '2box';
+kernType = 'flat';
 
 % Get values
 % Define boxcar
@@ -24,6 +24,17 @@ switch boxType
         % Hold the signal on from 1/3 to 2/3
         y = zeros([1,numX]);
         y(round(numX/3):round(2*numX/3)) = 1;
+    case '2box'
+        % Like a mix of twinPeaks and sustain:
+        % Have an extended signal that happens twice, with a big gap
+
+        % Old method
+        % y = zeros([1,numX]);
+        % y(round(numX/10):round(3*numX/10)) = 1;
+        % y(round(7*numX/10):round(9*numX/10)) = 1;
+
+        [~, y] = oscillator('square', 1, 2, 1, numX);
+        y = y + abs(min(y)); % shift up from 0
     case '3'
         % 3 random bumps
         y = zeros([1,numX]);
@@ -32,6 +43,8 @@ switch boxType
         y(inds) = .5;
     case 'sine'
         y = sin(x * pi * 2);
+    case 'triangle'
+        [~,y] = oscillator('triangle', 1, 2, 1, numX);
     otherwise
         error('Invalid boxType');
 end
@@ -39,8 +52,18 @@ x = ((1:numel(y)) - 1) / 5; % inventing a time scale
 
 % Define kernel
 switch kernType
-    case 'scallop'
-        kernel = [0 0.05 0.06 0.1 0.5 0.9 0];
+    case 'flat'
+        kernel = [.2 .2 .2 .2 .2];
+    case 'exp'
+        % an exponential curve
+        kernel = 0:.5:3;
+        kernel = kernel .^ 2;
+        kernel = kernel / max(kernel); % scale to unit size
+        % kernel = [0 0.05 0.06 0.1 0.5 0.9 0];
+    case 'gauss'
+        kx = -3:.5:3; % x must be centered on 0
+        kernel = normpdf(kx);
+        % discard x so everything is positive
     case 'pyramid'
         kernel = [0 0 .5 .5 1 1 .5 .5 0 0];
     case 'steps'
@@ -48,6 +71,8 @@ switch kernType
     case 'hrf'
         kernel = twoGammaHrf;
         kernel = kernel / max(kernel); % rescale so max is 1
+    case 'edge'
+        kernel = [0 1 0 -1 0];
     otherwise 
         error('Invalid kernType')
 end
@@ -59,6 +84,9 @@ w = conv(y,kernel);
 figure();
 ymax = max([y,kernel,w]);
 ymin = min([y,kernel,w]);
+% Add a little buffer
+ymax = ymax + (.1 * ymax);
+ymin = ymin - abs(.1 * ymin);
 subplot(3,1,1); % The signal
     plot(x,y);
     xlabel('Time');
