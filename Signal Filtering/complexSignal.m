@@ -4,8 +4,8 @@ function varargout = complexSignal(varargin)
 
 %% Play with these values to see how they impact the end result
 frequencies{1} = 0.1;
-frequencies{2} = 1;
-frequencies{3} = 7;
+frequencies{2} = 5;
+frequencies{3} = 15;
 
 %% Nuts and bolts
 % Parse input
@@ -26,17 +26,17 @@ figure();
 subplot(4,1,1);
     % Low freq wave
     plot(x,wave1);
-    title('Low freq wave');
+    title(sprintf('Low freq wave: %0.2f Hz', frequencies{1}));
     xlabel('Time (sec)');
     ylim([-max(combo), max(combo)]);
 subplot(4,1,2)
     plot(x,wave2);
-    title('Mid freq wave');
+    title(sprintf('Mid freq wave: %0.2f Hz', frequencies{2}));
     xlabel('Time (sec)');
     ylim([-max(combo), max(combo)]);
 subplot(4,1,3)
     plot(x,wave3);
-    title('High freq wave');
+    title(sprintf('High freq wave: %0.2f Hz', frequencies{3}));
     xlabel('Time (sec)');
     ylim([-max(combo), max(combo)]);
 subplot(4,1,4)
