@@ -27,19 +27,21 @@ function [duration, freq, amp, resolution] = parseInputs(nargs,args)
     % Resolution
     if nargs > 3
         resolution = args{4};
-        if resolution > 48
-            warning(['Provided sample rate of %0.2e kHz is unusually high! ' ...
-                'Given your input duration of %0.2e, this will produce x and y vectors '...
+        Nq = resolution /2; % Nyquist frequency
+
+        if resolution >= 48000
+            warning(['Provided sample rate of %0.2g Hz is unusually large! ' ...
+                'Given your input duration of %0.2g, this will produce x and y vectors '...
                 'that are both %i elements long!'], ...
-                resolution, duration, 1+duration*resolution*1000);
-        elseif resolution < 1
-            warning(['Provided sample rate of %0.5f kHz is unusually low! ' ...
-                'This is being interpreted as %0.5f samples per second, or '...
-                'once every ~%0.2f seconds!'], resolution, resolution * 1000, 1/(resolution * 1000));
+                resolution, duration, 1+duration*resolution);
+        elseif freq >= Nq
+            warning(['Provided frequency of %0.2g Hz exceeds the upper limit of %0.2g!\n' ...
+                'Either lower the frequency, or increase your sample rate to at least %0.2g'...
+                ], freq, Nq, freq * 2);
         end % warnings
     
     else
-        resolution = 8; % kHz, or this many thousand samples per second
+        resolution = 8000; % Hz, or this many samples per second
     end
-    resolution = 1/(resolution * 1000); % convert kHz to seconds
+    resolution = 1/resolution; % convert Hz to seconds
 end

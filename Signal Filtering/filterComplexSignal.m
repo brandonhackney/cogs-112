@@ -71,13 +71,13 @@ subplot(3,1,1)
     ylim([-ymax, ymax]);
     xlabel('Time (sec)');
 subplot(3,1,2)
-    plot(x,filtered);
-    title(sprintf('%s-filtered signal at cutoff %0.2f Hz', filterType, cutoff));
+    plot(x,y-filtered);
+    title(sprintf('Data removed by %s filter at cutoff of %0.2f Hz:', filterType, cutoff));
     ylim([-ymax, ymax]);
     xlabel('Time (sec)');
 subplot(3,1,3)
-    plot(x,y-filtered);
-    title('What was filtered');
+    plot(x,filtered);
+    title('Resulting filtered signal');
     ylim([-ymax, ymax]);
     xlabel('Time (sec)');
 end % function
