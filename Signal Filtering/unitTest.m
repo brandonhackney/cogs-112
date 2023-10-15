@@ -26,10 +26,21 @@ step2 = step1;
 %     step2(ifftshift(fqax) <= cutoff & ifftshift(fqax) >= -cutoff) = 0;
 
 % Low-pass filtering at 5Hz:
+% We need to identify positive and negative frequencies beyond 5Hz
+% fqax defines frequencies, but lines up with an fftshift()ed vector
+% So first, we ifftshift fqax so that it lines up with the not-shifted data
 cutoff = 5; % ??
-step2(ifftshift(fqax) >= cutoff & ifftshift(fqax) <= -cutoff) = 0;
-vis2 = fftshift(abs(step2)); % allow visualization
-filtered = ifft(step2);
+z = ifftshift(fqax);
+% Now, we can use the indices from this new vector to modify our FFT data
+% Remember that the FFT data covers positive and negative frequencies
+% So instead of setting up two inequalities, just use abs(z) to do both
+step2(abs(z) >= cutoff) = 0;
+% Now ifft out of frequency space to get a time-domain wave
+% This should be a filtered version of the input y data
+filtered = ifft(step2); % actual output - should be non-complex filtered
+% And this vector lets us visualize the filtered wave's power spectrum
+vis2 = fftshift(abs(step2));
+
 
 figure();
 subplot(5,1,1)
