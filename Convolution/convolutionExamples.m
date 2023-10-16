@@ -4,7 +4,7 @@
 % init
 close all
 boxType = '2box';
-kernType = 'flat';
+kernType = 'hrf';
 
 % Get values
 % Define boxcar
@@ -33,7 +33,7 @@ switch boxType
         % y(round(numX/10):round(3*numX/10)) = 1;
         % y(round(7*numX/10):round(9*numX/10)) = 1;
 
-        [~, y] = oscillator('square', 1, 2, 1, numX);
+        [~, y] = oscillator('square', 1, 2, 1, numX, .75);
         y = y + abs(min(y)); % shift up from 0
     case '3'
         % 3 random bumps
@@ -48,7 +48,8 @@ switch boxType
     otherwise
         error('Invalid boxType');
 end
-x = ((1:numel(y)) - 1) / 5; % inventing a time scale
+% ... not sure why I'm redefining x here?? comment out for now
+% x = ((1:numel(y)) - 1) / 5; % inventing a time scale
 
 % Define kernel
 switch kernType
@@ -78,7 +79,7 @@ switch kernType
 end
 
 % Convolve kernel with boxcar
-w = conv(y,kernel);
+w = conv(y,kernel, 'same');
 
 % Show all three elements at once:
 figure();
@@ -87,21 +88,51 @@ ymin = min([y,kernel,w]);
 % Add a little buffer
 ymax = ymax + (.1 * ymax);
 ymin = ymin - abs(.1 * ymin);
-subplot(3,1,1); % The signal
+% Initialize the animated vectors
+z = zeros(1,numX); % animated convolution
+k = z; % animated kernel
+subplot(4,1,1); % The signal
     plot(x,y);
     xlabel('Time');
     title('Boxcar');
     ylim([ymin,ymax]);
     xlim([0,max(x)]);
-subplot(3,1,2); % the kernel
+subplot(4,1,2); % the kernel
     plot(x(1:numel(kernel)),kernel);
     xlabel('Time');
     title('kernel');
     ylim([ymin,ymax]);
     xlim([0,max(x)]);
-subplot(3,1,3); % the convolution
-    plot(x,w(1:numel(x)));
-    xlabel('Time');
-    title('Convolution of boxcar and kernel');
+subplot(4,1,3); % animate the process
+    p = [y;k];
+    h1 = plot(x,p);
+    xlabel('Time (sec)');
+    title('Convolution of boxcar and kernel in action');
     ylim([ymin,ymax]);
     xlim([0,max(x)]);
+subplot(4,1,4); % animate the result
+    h2 = plot(x,z);
+    xlabel('Time');
+    title('Result of convolution');
+    ylim([ymin,ymax]);
+    xlim([0,max(x)]);
+
+% Animate!
+for i = 1:numX
+    % Get updated data
+    % z is an expanding subset of existing w
+    z(1:i) = w(1:i);
+    % k is the kernel, backward, and sliding from left to right
+    k = zeros([1,numX]); % init
+    k(i) = 1; % set a single impulse
+    k = conv(k, fliplr(kernel), 'same'); % convert impulse to kernel
+    p = num2cell([y;k], 2);
+    % Set updated data
+    set(h1, {'YData'}, p);
+    set(h2, 'YData', z);
+    % Draw to screen
+    drawnow;
+    % Pause to keep it at a particular frame rate
+    % 10/numX makes it last 10 seconds, no matter how long x is
+    pause(10/numX);
+end
