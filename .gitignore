@@ -9,3 +9,6 @@ __pycache__/
 *$py.class
 
 .Rhistory
+
+# Test files
+unitTest*.m

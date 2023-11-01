@@ -3,7 +3,7 @@
 
 % init
 close all
-boxType = '2box';
+boxType = 'triangle';
 kernType = 'hrf';
 
 % Get values
@@ -33,7 +33,7 @@ switch boxType
         % y(round(numX/10):round(3*numX/10)) = 1;
         % y(round(7*numX/10):round(9*numX/10)) = 1;
 
-        [~, y] = oscillator('square', 1, 2, 1, numX, .75);
+        [~, y] = oscillator('square', 1, 2, 1, numX-1, .75);
         y = y + abs(min(y)); % shift up from 0
     case '3'
         % 3 random bumps
@@ -44,7 +44,7 @@ switch boxType
     case 'sine'
         y = sin(x * pi * 2);
     case 'triangle'
-        [~,y] = oscillator('triangle', 1, 2, 1, numX);
+        [~,y] = oscillator('triangle', 1, 2, 1, numX-1);
     otherwise
         error('Invalid boxType');
 end
