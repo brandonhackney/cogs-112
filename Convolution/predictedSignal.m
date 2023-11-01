@@ -1,7 +1,19 @@
+function varargout = predictedSignal(varargin)
+% (y, x) = predictedSignal(duration, sampleRate)
+% Defaults to a 3-minute signal at sample rate of 20 Hz
 close all;
-
-dur = 60*3;
-rate = 20;
+if nargin > 0
+    % Duration
+    dur = varargin{1};
+else
+    dur = 60*3;
+end
+if nargin > 1
+    % Sample Rate
+    rate = varargin{2};
+else
+    rate = 800;
+end
 % Plot condition 1
 subplot(7,1,1)
     amp = 1;
@@ -76,3 +88,11 @@ subplot(7,1,7)
         ylabel('Amplitude');
         title('Predicted brain signal (Downsampled to TR = 3)');
         ylim([min(b) - abs(.1 * min(b)), max(b) + 0.1 * max(b)]);
+
+% Define outputs
+if nargout > 0
+    varargout{1} = pred;
+end
+if nargout > 1
+    varargout{2} = a;
+end

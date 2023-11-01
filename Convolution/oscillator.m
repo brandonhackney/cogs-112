@@ -42,7 +42,7 @@ end
 
     % generate x axis vector
     stepSize = 1/sampleRate;
-        x = 0:stepSize:duration-stepSize;
+        x = 0:stepSize:duration;
     % init
         y = 0;
     
