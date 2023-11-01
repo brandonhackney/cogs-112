@@ -4,7 +4,7 @@ In-class demonstrations for Emily Grossman's Intro to fMRI class at UC Irvine. T
 Convolution
 -
 The 'Convolution' folder has two important functions:
-- convolutionExamples is a script that lets you test out various kernels and boxcars, and animates the process of convolution for you.
+- RunMe will open a GUI that lets you test out various kernels and boxcars, and animates the process of convolution for you.
 - predictedSignal is a function applies this concept directly to MR data by generating a predicted brain response based on stimulus timing information
 
 Filtering
