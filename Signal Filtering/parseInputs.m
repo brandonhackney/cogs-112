@@ -3,7 +3,7 @@ function [duration, freq, amp, resolution] = parseInputs(nargs,args)
 % Send me nargin and varargin
 
     for i = 1:nargs
-        assert(isnumeric(args{i}) && args{i} > 0, 'Input %i must be a positive number', i);
+        assert(isnumeric(args{i}) && args{i} >= 0, 'Input %i must be a positive number', i);
     end
     
     % Duration
