@@ -3,12 +3,17 @@
 
 % init
 close all
-boxType = 'triangle';
-kernType = 'hrf';
+boxType = 'sine';
+kernType = 'flat';
 
 % Get values
 % Define boxcar
 x = 0:0.1:10; % inventing a time scale of 0-5 sec in 0.1 sec increments
+
+sr = 10;
+dur = 100;
+x = 0:1/sr:dur;
+
 numX = numel(x);
 switch boxType
     case 'midline'
@@ -42,7 +47,8 @@ switch boxType
         inds = temp(1:3);
         y(inds) = .5;
     case 'sine'
-        y = sin(x * pi * 2);
+        % y = sin(x * pi * 2);
+        [~,y] = oscillator('sine', 1, 2, 1, numX-1);
     case 'triangle'
         [~,y] = oscillator('triangle', 1, 2, 1, numX-1);
     otherwise
@@ -70,7 +76,7 @@ switch kernType
     case 'steps'
         kernel = [0 0 .2 .2 .4 .4 .6 .6];
     case 'hrf'
-        kernel = twoGammaHrf;
+        kernel = twoGammaHrf(30, 1/sr);
         kernel = kernel / max(kernel); % rescale so max is 1
     case 'edge'
         kernel = [0 1 0 -1 0];
@@ -80,6 +86,7 @@ end
 
 % Convolve kernel with boxcar
 w = conv(y,kernel, 'same');
+w = w / max(w); % scale to unit height
 
 % Show all three elements at once:
 figure();
@@ -134,5 +141,6 @@ for i = 1:numX
     drawnow;
     % Pause to keep it at a particular frame rate
     % 10/numX makes it last 10 seconds, no matter how long x is
-    pause(10/numX);
+    % pause(10/numX);
+    
 end
