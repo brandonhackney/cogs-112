@@ -24,6 +24,14 @@ else
     dur = 10; % default to a 10 sec signal
 end
 
+if nargin > 3
+    toplot = varargin{4};
+    validVals = {'noplot','plot'};
+    assert(ismember(toplot, validVals), 'Final argument must be either "plot" or "noplot"');
+else
+    toplot = 'plot';
+end
+
 % Calculate wave vectors
 [wave1, x] = osc(dur,frequencies(1),1,sr); % low freq
 wave2 = osc(dur, frequencies(2),1,sr); % medium freq
@@ -31,28 +39,33 @@ wave3 = osc(dur, frequencies(3),1,sr); % high freq
 combo = wave1 + wave2 + wave3;
 
 % Plot the results
-figure();
-subplot(4,1,1);
-    % Low freq wave
-    plot(x,wave1);
-    title(sprintf('Low freq wave: %0.2f Hz', frequencies(1)));
-    xlabel('Time (sec)');
-    ylim([-max(combo), max(combo)]);
-subplot(4,1,2)
-    plot(x,wave2);
-    title(sprintf('Mid freq wave: %0.2f Hz', frequencies(2)));
-    xlabel('Time (sec)');
-    ylim([-max(combo), max(combo)]);
-subplot(4,1,3)
-    plot(x,wave3);
-    title(sprintf('High freq wave: %0.2f Hz', frequencies(3)));
-    xlabel('Time (sec)');
-    ylim([-max(combo), max(combo)]);
-subplot(4,1,4)
-    plot(x,combo);
-    title('Combined signal');
-    xlabel('Time (sec)');
-    ylim([-max(combo), max(combo)]);
+switch toplot
+    case 'plot'
+        figure();
+        subplot(4,1,1);
+            % Low freq wave
+            plot(x,wave1);
+            title(sprintf('Low freq wave: %0.2f Hz', frequencies(1)));
+            xlabel('Time (sec)');
+            ylim([-max(combo), max(combo)]);
+        subplot(4,1,2)
+            plot(x,wave2);
+            title(sprintf('Mid freq wave: %0.2f Hz', frequencies(2)));
+            xlabel('Time (sec)');
+            ylim([-max(combo), max(combo)]);
+        subplot(4,1,3)
+            plot(x,wave3);
+            title(sprintf('High freq wave: %0.2f Hz', frequencies(3)));
+            xlabel('Time (sec)');
+            ylim([-max(combo), max(combo)]);
+        subplot(4,1,4)
+            plot(x,combo);
+            title('Combined signal');
+            xlabel('Time (sec)');
+            ylim([-max(combo), max(combo)]);
+    case 'noplot'
+        % Don't plot
+end
 
 % Outputs
 if nargout > 0

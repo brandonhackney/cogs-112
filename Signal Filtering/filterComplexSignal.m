@@ -1,9 +1,17 @@
-function filterComplexSignal(y,x, sr, filterType, varargin)
+function varargout = filterComplexSignal(y,x, sr, filterType, varargin)
 % Parse inputs
 filterList = {'lowpass','highpass','bandpass'};
 assert(numel(y) > 1 && numel(x) > 1, 'First two inputs must be the wave vectors from complexSignal')
 assert(ischar(filterType), 'Filter type must be a string');
 assert(ismember(filterType, filterList), 'Invalid filter type %s! Options are: %s', strjoin(filterList, ', '));
+
+if nargin > 5
+    toplot = varargin{2};
+    validVals = {'noplot','plot'};
+    assert(ismember(toplot, validVals), 'Final argument must be either "plot" or "noplot"');
+else
+    toplot = 'plot';
+end
 
 % Nyquist
 Nq = sr / 2;
@@ -24,6 +32,10 @@ switch filterType
         % Only keep the things BELOW this value
         if exist('varargin', 'var')
             cutoff = varargin{1};
+            % if you passed a bandpass array, take the lower value
+            if numel(cutoff) > 1
+                cutoff = cutoff(1);
+            end
         else
             % Set a default of 5 Hz
             cutoff = 5;
@@ -35,6 +47,10 @@ switch filterType
         % Only keep the things ABOVE this value
         if exist('varargin', 'var')
             cutoff = varargin{1};
+            % If you passed a bandpass array, take the higher value
+            if numel(cutoff) > 1
+                cutoff = cutoff(2);
+            end
         else
             cutoff = 1;
         end
@@ -63,21 +79,30 @@ end
 filtered = ifft(step2);
 
 %% Plot result
-ymax = max(max([filtered;y]));
-figure();
-subplot(3,1,1)
-    plot(x,y);
-    title('Input signal');
-    ylim([-ymax, ymax]);
-    xlabel('Time (sec)');
-subplot(3,1,2)
-    plot(x,y-filtered);
-    title(sprintf('Data removed by %s filter at cutoff of %0.2f Hz:', filterType, cutoff));
-    ylim([-ymax, ymax]);
-    xlabel('Time (sec)');
-subplot(3,1,3)
-    plot(x,filtered);
-    title('Resulting filtered signal');
-    ylim([-ymax, ymax]);
-    xlabel('Time (sec)');
+switch toplot
+    case 'plot'
+        ymax = max(max([filtered;y]));
+        figure();
+        subplot(3,1,1)
+            plot(x,y);
+            title('Input signal');
+            ylim([-ymax, ymax]);
+            xlabel('Time (sec)');
+        subplot(3,1,2)
+            plot(x,y-filtered);
+            title(sprintf('Data removed by %s filter at cutoff of %0.2f Hz:', filterType, cutoff));
+            ylim([-ymax, ymax]);
+            xlabel('Time (sec)');
+        subplot(3,1,3)
+            plot(x,filtered);
+            title('Resulting filtered signal');
+            ylim([-ymax, ymax]);
+            xlabel('Time (sec)');
+    case 'noplot'
+        % ...don't
+end
+
+% Outputs
+if nargout > 0
+    varargout{1} = filtered;
 end % function
