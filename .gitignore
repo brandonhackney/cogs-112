@@ -12,3 +12,4 @@ __pycache__/
 
 # Test files
 unitTest*.m
+tools/
