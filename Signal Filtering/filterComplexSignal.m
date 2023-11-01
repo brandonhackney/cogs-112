@@ -59,7 +59,7 @@ switch filterType
     case 'bandpass'
         % Get TWO cutoff frequencies
         % Only keep the things BETWEEN these values
-        if exist('varargin', 'var')
+        if ~isempty(varargin)
             cutoff = varargin{1};
             assert(length(cutoff) == 2, 'Cutoff must be a two-element vector when using a bandpass filter');
             cut1 = cutoff(1);
@@ -72,8 +72,9 @@ switch filterType
         end
         % Report the center band when plotting
         cutoff = mean([cut1, cut2]);
-        % Apply the filter
-        step2(abs(z) <= cut1 & abs(z) >= cut2) = 0;
+        % Apply the filter in 2 steps - delete the low and high bits
+        step2(abs(z) <= cut1) = 0; % drop anything under low cutoff
+        step2(abs(z) >= cut2) = 0; % drop anything over high cutoff
 end
 % step2 is still in frequency space - convert back to a wave with ifft
 filtered = ifft(step2);
