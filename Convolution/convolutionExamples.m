@@ -3,8 +3,8 @@
 
 % init
 close all
-boxType = 'sine';
-kernType = 'flat';
+boxType = 'midline';
+kernType = 'gauss';
 
 % Get values
 % Define boxcar
@@ -85,7 +85,8 @@ switch kernType
 end
 
 % Convolve kernel with boxcar
-w = conv(y,kernel, 'same');
+w = conv(y,kernel, 'full');
+w = w(1:numel(y)); % truncate to length of original vector
 w = w / max(w); % scale to unit height
 
 % Show all three elements at once:
@@ -131,8 +132,13 @@ for i = 1:numX
     z(1:i) = w(1:i);
     % k is the kernel, backward, and sliding from left to right
     k = zeros([1,numX]); % init
+    % Reverse kernel
+    subkernel = fliplr(kernel);
     k(i) = 1; % set a single impulse
-    k = conv(k, fliplr(kernel), 'same'); % convert impulse to kernel
+    k = conv(k, subkernel, 'full'); % convert impulse to kernel
+    numK = length(subkernel);
+    % k = k(numK:numX+numK-1); % truncate the resulting extension
+    k = k(numK:end);
     p = num2cell([y;k], 2);
     % Set updated data
     set(h1, {'YData'}, p);
