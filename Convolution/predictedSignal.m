@@ -62,8 +62,12 @@ kx(1:length(kernel)) = kernel;
         ylim([min(b) - abs(.1 * min(b)), max(b) + 0.1 * max(b)]);
 
 % Convolve the vectors with the HRF kernel
-b2 = conv(b,kernel, 'same'); b2 = b2/max(b2);
-d2 = conv(d, kernel, 'same'); d2 = d2/max(d2);
+b2 = conv(b,kernel, 'full');
+b2 = b2(1:end-length(kernel)+1); % truncate
+    b2 = b2/max(b2); % rescale
+d2 = conv(d, kernel, 'full');
+d2 = d2(1:end-length(kernel)+1); % truncate
+    d2 = d2/max(d2); % rescale
 subplot(7,1,5)
     plot(a,[b2',d2']);
         xlabel('Time (sec)');
